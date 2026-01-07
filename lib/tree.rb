@@ -163,17 +163,41 @@ class Tree
 
     result
   end
+
+  def find_depth(value, node = @root, depth = 0)
+    return nil if node.nil?
+    return depth if node.value == value
+
+    if value < node.value
+      find_depth(value, node.left, depth + 1)
+    else
+      find_depth(value, node.right, depth + 1)
+    end
+  end
+
+  def find_height(value, node = @root)
+    return nil if node.nil?
+
+    if value == node.value
+      height(node)
+    elsif value < node.value
+      find_height(value, node.left)
+    else
+      find_height(value, node.right)
+    end
+  end
+
+  def height(node)
+    return -1 if node.nil?
+
+    1 + [height(node.left), height(node.right)].max
+  end
 end
 
 tree = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
 tree.insert_iterative(8000)
 tree.insert_node(12)
 tree.pretty_print
-tree.delete_node(8)
-tree.pretty_print
 
-# yield block test
-# tree.postorder { |node| puts "Visiting node: #{node.value}" }
-p tree.postorder
-p tree.inorder
-p tree.preorder
+p tree.find_depth(8000)
+p tree.find_height(8000)
