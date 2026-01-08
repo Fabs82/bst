@@ -164,40 +164,62 @@ class Tree
     result
   end
 
-  def find_depth(value, node = @root, depth = 0)
+  def find_node_depth(value, node = @root, depth = 0)
+    # find the depth of a node with given value
     return nil if node.nil?
     return depth if node.value == value
 
     if value < node.value
-      find_depth(value, node.left, depth + 1)
+      find_node_depth(value, node.left, depth + 1)
     else
-      find_depth(value, node.right, depth + 1)
+      find_node_depth(value, node.right, depth + 1)
     end
   end
 
-  def find_height(value, node = @root)
-    return nil if node.nil?
+  def find_node_height(value, node = @root)
+    # find the height of a node with given value
+    target_node = find_recursive(value, node)
+    return height(target_node) unless target_node.nil?
 
-    if value == node.value
-      height(node)
-    elsif value < node.value
-      find_height(value, node.left)
-    else
-      find_height(value, node.right)
-    end
+    nil
   end
 
   def height(node)
+    # helper method to calculate the height of a node
     return -1 if node.nil?
 
     1 + [height(node.left), height(node.right)].max
   end
+
+  def balanced?(node = @root)
+    # check if the tree is balanced
+    return true if node.nil?
+
+    left_height = height(node.left)
+    right_height = height(node.right)
+
+    # return false if the difference between the heights of left and right subtrees is > 1
+    return false if (left_height - right_height).abs > 1
+
+    # recurisively check if left and right subtrees are balanced
+    balanced?(node.left) && balanced?(node.right)
+  end
+
+  def rebalance
+    return if balanced?
+
+    new_tree = inorder
+    @root = build_tree(new_tree)
+  end
 end
 
-tree = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324])
-tree.insert_iterative(8000)
-tree.insert_node(12)
+tree = Tree.new([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324, 8000, 12])
 tree.pretty_print
-
-p tree.find_depth(8000)
-p tree.find_height(8000)
+tree.insert_iterative(10)
+tree.insert_iterative(167_200)
+tree.insert_iterative(200_000)
+tree.pretty_print
+p tree.balanced?
+p tree.rebalance
+p tree.pretty_print
+p tree.balanced?
